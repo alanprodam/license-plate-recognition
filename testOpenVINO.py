@@ -32,7 +32,8 @@ seq_ind = np.ones([88, 1], dtype=np.float32)
 seq_ind[0, 0] = 0
 
 #https://docs.openvinotoolkit.org/2019_R1/_license_plate_recognition_barrier_0001_description_license_plate_recognition_barrier_0001.html
-lpr_net = cv2.dnn.Net_readFromModelOptimizer('./license-plate-recognition-barrier-0001/license-plate-recognition-barrier-0001.xml', './license-plate-recognition-barrier-0001/license-plate-recognition-barrier-0001.bin')
+lpr_net = cv2.dnn.Net_readFromModelOptimizer('./license-plate-recognition-barrier-0001/license-plate-recognition-barrier-0001.xml',
+                                             './license-plate-recognition-barrier-0001/license-plate-recognition-barrier-0001.bin')
 
 lpr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 lpr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
@@ -41,13 +42,15 @@ lpr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 CAR_COLORS = ["white", "gray", "yellow", "red", "green", "blue", "black"]
 CAR_TYPES = ["car", "bus", "truck", "van"]
 #https://docs.openvinotoolkit.org/2019_R1/_vehicle_attributes_recognition_barrier_0039_description_vehicle_attributes_recognition_barrier_0039.html
-attr_net = cv2.dnn.Net_readFromModelOptimizer('./vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.xml', './vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.bin')
+attr_net = cv2.dnn.Net_readFromModelOptimizer('./vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.xml',
+                                              './vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.bin')
 
 attr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 attr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
 #https://docs.openvinotoolkit.org/2019_R1/_vehicle_license_plate_detection_barrier_0106_description_vehicle_license_plate_detection_barrier_0106.html
-pd_net = cv2.dnn.readNet('./vehicle-license-plate-detection-barrier-0106/vehicle-license-plate-detection-barrier-0106.xml', './vehicle-license-plate-detection-barrier-0106/vehicle-license-plate-detection-barrier-0106.bin')
+pd_net = cv2.dnn.readNet('./vehicle-license-plate-detection-barrier-0106/vehicle-license-plate-detection-barrier-0106.xml',
+                         './vehicle-license-plate-detection-barrier-0106/vehicle-license-plate-detection-barrier-0106.bin')
 
 pd_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 pd_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
@@ -148,4 +151,3 @@ for imagePath in paths.list_images(TEST_PATH):
     plateRecognition(img)
     #if bShowColor:
     cv2.waitKey(0)
-    
