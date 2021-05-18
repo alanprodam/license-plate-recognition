@@ -11,13 +11,13 @@ while (True):
     # print(frame.shape) #720x1280x3
 
     # imgResize = cv2.resize(frame,(320,240))
-    imgResize = cv2.resize(frame, (640, 480))
+    #imgResize = cv2.resize(frame, (640, 480))
     # print(imgResize.shape)
 
-    gray = cv2.cvtColor(imgResize, cv2.COLOR_BGR2GRAY)
+    #gray = cv2.cvtColor(imgResize, cv2.COLOR_BGR2GRAY)
 
     # -- Print img gray
-    cv2.imshow('RTSP', gray)
+    cv2.imshow('RTSP', frame)
 
     if cv2.waitKey(16) & 0xFF == ord('q'):
         break

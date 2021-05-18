@@ -23,10 +23,11 @@ def predict(frame, net):
     return predictions
 
 # Load the model
-lpr_net = cv2.dnn.Net_readFromModelOptimizer('data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.xml', 
-                                             'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.bin')
+lpr_net = cv2.dnn.Net_readFromModelOptimizer(
+    'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.xml',
+    'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.bin')
 
-net = cv2.dnn.readNet('data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.xml',
+net = cv2.dnn.Net_readFromModelOptimizer('data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.xml',
                       'data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.bin')
 
 

@@ -43,8 +43,8 @@ CAR_COLORS = ["white", "gray", "yellow", "red", "green", "blue", "black"]
 CAR_TYPES = ["car", "bus", "truck", "van"]
 # https://docs.openvinotoolkit.org/2019_R1/_vehicle_attributes_recognition_barrier_0039_description_vehicle_attributes_recognition_barrier_0039.html
 attr_net = cv2.dnn.Net_readFromModelOptimizer(
-    'data/vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.xml',
-    'data/vehicle-attributes-recognition-barrier-0039/vehicle-attributes-recognition-barrier-0039.bin')
+    'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.xml',
+    'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.bin')
 
 attr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 attr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)

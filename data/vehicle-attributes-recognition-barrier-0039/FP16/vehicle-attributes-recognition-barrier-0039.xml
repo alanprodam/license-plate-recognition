@@ -12,7 +12,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="1" name="data_mul_19351939/copy_const" type="Const" version="opset1">
+		<layer id="1" name="data_mul_1877_const" type="Const" version="opset1">
 			<data element_type="f16" offset="0" shape="1,3,1,1" size="6"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -23,7 +23,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="2" name="Mul_/Fused_Mul_" type="Multiply" version="opset1">
+		<layer id="2" name="input/scale_value/Fused_Mul_" type="Multiply" version="opset1">
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -47,7 +47,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="3" name="data_add_1941/copy_const" type="Const" version="opset1">
+		<layer id="3" name="data_add_1879_const" type="Const" version="opset1">
 			<data element_type="f16" offset="6" shape="1,3,1,1" size="6"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -82,7 +82,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="5" name="BatchNorm2/mean/Fused_Mul_20742076_const" type="Const" version="opset1">
+		<layer id="5" name="BatchNorm2/mean/Fused_Mul_20522054_const" type="Const" version="opset1">
 			<data element_type="f16" offset="12" shape="64,3,7,7" size="18816"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -118,7 +118,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="7" name="data_add_19441949/copy_const" type="Const" version="opset1">
+		<layer id="7" name="data_add_188218871951/EltwiseUnsqueeze1977_const" type="Const" version="opset1">
 			<data element_type="f16" offset="18828" shape="1,64,1,1" size="128"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -190,7 +190,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="11" name="BatchNorm3/mean/Fused_Mul_20782080_const" type="Const" version="opset1">
+		<layer id="11" name="BatchNorm3/mean/Fused_Mul_20562058_const" type="Const" version="opset1">
 			<data element_type="f16" offset="18956" shape="64,64,3,3" size="73728"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -226,7 +226,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="13" name="data_add_19521957/copy_const" type="Const" version="opset1">
+		<layer id="13" name="data_add_189018951953/EltwiseUnsqueeze1985_const" type="Const" version="opset1">
 			<data element_type="f16" offset="92684" shape="1,64,1,1" size="128"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -279,7 +279,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="16" name="100/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="16" name="81/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="92812" shape="64,64,3,3" size="73728"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -339,7 +339,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="19" name="data_mul_19591963/copy_const" type="Const" version="opset1">
+		<layer id="19" name="data_mul_189719011954/EltwiseUnsqueeze1989_const" type="Const" version="opset1">
 			<data element_type="f16" offset="166540" shape="1,64,1,1" size="128"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -374,7 +374,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="21" name="data_add_19601965/copy_const" type="Const" version="opset1">
+		<layer id="21" name="data_add_189819031955/EltwiseUnsqueeze1993_const" type="Const" version="opset1">
 			<data element_type="f16" offset="166668" shape="1,64,1,1" size="128"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -427,7 +427,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="24" name="BatchNorm5/mean/Fused_Mul_20822084_const" type="Const" version="opset1">
+		<layer id="24" name="BatchNorm5/mean/Fused_Mul_20602062_const" type="Const" version="opset1">
 			<data element_type="f16" offset="166796" shape="128,64,3,3" size="147456"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -463,7 +463,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="26" name="data_add_19681973/copy_const" type="Const" version="opset1">
+		<layer id="26" name="data_add_190619111957/EltwiseUnsqueeze2001_const" type="Const" version="opset1">
 			<data element_type="f16" offset="314252" shape="1,128,1,1" size="256"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -516,7 +516,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="29" name="81/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="29" name="82/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="314508" shape="128,128,3,3" size="294912"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -552,7 +552,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="31" name="99/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="31" name="80/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="609420" shape="128,64,1,1" size="16384"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -612,7 +612,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="34" name="data_mul_19751979/copy_const" type="Const" version="opset1">
+		<layer id="34" name="data_mul_191319171958/EltwiseUnsqueeze2005_const" type="Const" version="opset1">
 			<data element_type="f16" offset="625804" shape="1,128,1,1" size="256"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -647,7 +647,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="36" name="data_add_19761981/copy_const" type="Const" version="opset1">
+		<layer id="36" name="data_add_191419191959/EltwiseUnsqueeze2009_const" type="Const" version="opset1">
 			<data element_type="f16" offset="626060" shape="1,128,1,1" size="256"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -700,7 +700,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="39" name="BatchNorm7_/mean/Fused_Mul_20862088_const" type="Const" version="opset1">
+		<layer id="39" name="BatchNorm7_/mean/Fused_Mul_20642066_const" type="Const" version="opset1">
 			<data element_type="f16" offset="626316" shape="128,128,3,3" size="294912"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -736,7 +736,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="41" name="data_add_19841989/copy_const" type="Const" version="opset1">
+		<layer id="41" name="data_add_192219271961/EltwiseUnsqueeze2017_const" type="Const" version="opset1">
 			<data element_type="f16" offset="921228" shape="1,128,1,1" size="256"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -789,7 +789,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="44" name="51/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="44" name="89/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="921484" shape="128,128,3,3" size="294912"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -825,7 +825,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="46" name="66/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="46" name="92/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="1216396" shape="128,128,1,1" size="32768"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -885,7 +885,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="49" name="74/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="49" name="58/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="1249164" shape="7,128,1,1" size="1792"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -921,7 +921,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="51" name="conv_color/Dims1180/copy_const" type="Const" version="opset1">
+		<layer id="51" name="conv_color/Dims11241947/EltwiseUnsqueeze1969_const" type="Const" version="opset1">
 			<data element_type="f16" offset="1250956" shape="1,7,1,1" size="14"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -1100,7 +1100,7 @@
 				</port>
 			</input>
 		</layer>
-		<layer id="64" name="88/Output_0/Data__const" type="Const" version="opset1">
+		<layer id="64" name="87/Output_0/Data__const" type="Const" version="opset1">
 			<data element_type="f16" offset="1250994" shape="4,128,1,1" size="1024"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -1136,7 +1136,7 @@
 				</port>
 			</output>
 		</layer>
-		<layer id="66" name="conv_type/Dims1192/copy_const" type="Const" version="opset1">
+		<layer id="66" name="conv_type/Dims11181946/EltwiseUnsqueeze1965_const" type="Const" version="opset1">
 			<data element_type="f16" offset="1252018" shape="1,4,1,1" size="8"/>
 			<output>
 				<port id="1" precision="FP16">
@@ -1402,7 +1402,7 @@
 		<edge from-layer="77" from-port="1" to-layer="78" to-port="0"/>
 	</edges>
 	<meta_data>
-		<MO_version value="2021.1.0-1223-31b3e356abc-releases/2021/1"/>
+		<MO_version value="2021.2.0-1867-8f507a07f5f-releases/2021/2"/>
 		<cli_parameters>
 			<caffe_parser_path value="DIR"/>
 			<data_type value="FP16"/>
