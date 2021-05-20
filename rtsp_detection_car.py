@@ -127,37 +127,45 @@ if __name__ == '__main__':
     seq_ind[0, 0] = 0
 
     # Load the model
-    lpr_net = cv2.dnn.Net_readFromModelOptimizer(
-        'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.xml',
-        'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.bin')
+    # lpr_net = cv2.dnn.Net_readFromModelOptimizer(
+    #     'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.xml',
+    #     'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.bin')
+    #
+    # attr_net = cv2.dnn.Net_readFromModelOptimizer(
+    #     'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.xml',
+    #     'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.bin')
+    #
+    # pd_net = cv2.dnn.readNet(
+    #     'data/vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.xml',
+    #     'data/vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.bin')
+    #
+    # yolo_net = cv2.dnn.readNet(
+    #     'data/yolo-v2-tiny-vehicle-detection-0001/FP16/yolo-v2-tiny-vehicle-detection-0001.xml',
+    #     'data/yolo-v2-tiny-vehicle-detection-0001/FP16/yolo-v2-tiny-vehicle-detection-0001.bin')
 
-    attr_net = cv2.dnn.Net_readFromModelOptimizer(
-        'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.xml',
-        'data/vehicle-attributes-recognition-barrier-0039/FP32/vehicle-attributes-recognition-barrier-0039.bin')
-
-    pd_net = cv2.dnn.readNet(
-        'data/vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.xml',
-        'data/vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.bin')
-
-    yolo_net = cv2.dnn.readNet(
-        'data/yolo-v2-tiny-vehicle-detection-0001/FP16/yolo-v2-tiny-vehicle-detection-0001.xml',
-        'data/yolo-v2-tiny-vehicle-detection-0001/FP16/yolo-v2-tiny-vehicle-detection-0001.bin')
-
-    # Specify target device
-    lpr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
-    lpr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-
-    # Specify target device
-    attr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
-    attr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    net = cv2.dnn.readNet(
+        'data/vehicle-detection-0200/FP16/vehicle-detection-0200.xml',
+        'data/vehicle-detection-0200/FP16/vehicle-detection-0200.bin')
 
     # Specify target device
-    pd_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    pd_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
+    # lpr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
+    # lpr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    #
+    # # Specify target device
+    # attr_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
+    # attr_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    #
+    # # Specify target device
+    # pd_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    # pd_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
+    #
+    # # Specify target device
+    # yolo_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    # yolo_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 
     # Specify target device
-    yolo_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    yolo_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
 
     video = cv2.VideoCapture("rtsp://admin:tipa1234@192.168.90.243:554/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@saojoaquim.letmein.com.br:559/cam/realmonitor?channel=1&subtype=0")
@@ -181,30 +189,31 @@ if __name__ == '__main__':
 
         # name: "input" , shape: [1x3x300x300] - An input image in the format [BxCxHxW], where:
         # Chama primeira rede neural referente detecção do veículo
-        pd_blob = cv2.dnn.blobFromImage(frame, size=(300, 300), ddepth=cv2.CV_8U)
-        pd_net.setInput(pd_blob)
-        out_pb = pd_net.forward()
-
+        blob = cv2.dnn.blobFromImage(frame, size=(256, 256), ddepth=cv2.CV_8U)
+        net.setInput(blob)
+        out = net.forward()
 
 
         # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
         # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
         # An every detection is a vector [imageId, classId, conf, x, y, X, Y]
-        for detection in out_pb.reshape(-1, 7):
+        for detection in out.reshape(-1, 7):
             conf = detection[2]
-            print("conf: ", conf)
-            if conf < 0.1:
+
+            if conf < 0.95:
                 continue
 
             # Classe de identificação do carro
-            classId = int(detection[1])
-            if classId == 1:  # car
-                xmin = int(detection[3] * frame.shape[1])
-                ymin = int(detection[4] * frame.shape[0])
-                xmax = int(detection[5] * frame.shape[1])
-                ymax = int(detection[6] * frame.shape[0])
+            # classId = int(detection[1])
+            # if classId == 1:  # car
+            # if conf > 0.6:  # car
+            print('conf: ', conf)
+            xmin = int(detection[3] * frame.shape[1])
+            ymin = int(detection[4] * frame.shape[0])
+            xmax = int(detection[5] * frame.shape[1])
+            ymax = int(detection[6] * frame.shape[0])
 
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
 
         # -- Print img gray
         cv2.imshow('RTSP', frame)
