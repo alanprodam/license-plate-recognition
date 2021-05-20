@@ -27,8 +27,9 @@ lpr_net = cv2.dnn.Net_readFromModelOptimizer(
     'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.xml',
     'data/license-plate-recognition-barrier-0001/FP32/license-plate-recognition-barrier-0001.bin')
 
-net = cv2.dnn.Net_readFromModelOptimizer('data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.xml',
-                      'data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.bin')
+net = cv2.dnn.Net_readFromModelOptimizer(
+    'data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.xml',
+     'data/vehicle-license-plate-detection-barrier-0106/FP32/vehicle-license-plate-detection-barrier-0106.bin')
 
 
 # Specify target device
