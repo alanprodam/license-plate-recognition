@@ -49,7 +49,7 @@ def segmentationOpenCV(video):
             continue
 
         resize_width = int(frame_width * 0.4)
-        resize_height = int(frame_height*0.4)
+        resize_height = int(frame_height * 0.4)
 
         # -- Resize image with INTER_CUBIC
         resize = cv2.resize(frame, (resize_width, resize_height), interpolation=cv2.INTER_CUBIC)
@@ -104,6 +104,7 @@ def segmentationOpenCV(video):
     video.release()
     cv2.destroyAllWindows()
 
+
 def segmentationOpenVino(video):
     # Load the model vehicle-recognition-0039 (Identifica o tipo de carro)
     net = cv2.dnn.Net_readFromModelOptimizer(
@@ -129,6 +130,7 @@ def segmentationOpenVino(video):
         out = net.forward()
 
         # print('out: ', out)
+        # calculate_centr_distances(centroid_1, centroid_2)
 
         listDetections = []
         # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
@@ -153,8 +155,8 @@ def segmentationOpenVino(video):
             ymin = int(detection[3] * frame.shape[0])
             # xmax = int(detection[5] * frame.shape[1])
             # ymax = int(detection[6] * frame.shape[0])
-        #
-        #
+            #
+            #
             # cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
             stop = timeit.default_timer()
             time_cascade = round((stop - start) * 1000, 1)
@@ -162,11 +164,8 @@ def segmentationOpenVino(video):
         #     ############## Time ##############
         #     putText(frame, str(label), xmin, ymin, color_font)
 
-
-
         showImg = imutils.resize(frame, height=800)
         cv2.imshow("showImg", showImg)
-
 
         if cv2.waitKey(106) & 0xFF == ord('q'):
             break
@@ -221,24 +220,26 @@ def getRadar(video):
     thickness = 5
 
     image_id = 0
+    center_last = 0
+    car_tracked = False
+    start = 0
 
     while True:
-        ############## Time ##############
-        start = timeit.default_timer()
-
         # -- Capture frame-by-frame
         _, frame = video.read()
-
-        # -- Capture frame-by-frame
-        # plateRecognition(frame)
-
-        region_init_x = int(1080 / 1.5)
-        region_init_y = int(1920 / 7)
 
         if frame is None:
             continue
 
+        # espaço de calculo
+        delta_s = 35
+        region_init_x = int(1080 / 1.5)
+        region_init_y = int(1920 / 7)
+
         # Recorte do veiculo identificado
+        frame_out = frame[450:frame_height, 200:frame_width - 500]
+        # cv2.rectangle(frame, (200, 450), (frame_width-500, frame_height), vColor, rectThinkness)
+
         cutImgInit = frame[region_init_x:frame_width, region_init_y:int(region_init_y * 5)]
         coord_imgInit = region_init_x, frame_width, region_init_y, int(region_init_y * 5)
 
@@ -246,12 +247,12 @@ def getRadar(video):
         # Chama primeira rede neural referente detecção do veículo
         # blob = cv2.dnn.blobFromImage(frame, size=(300, 300), ddepth=cv2.CV_8U)
         # blob = cv2.dnn.blobFromImage(frame, size=(384, 672), ddepth=cv2.CV_8U)
-        blob = cv2.dnn.blobFromImage(frame, size=(512, 512), ddepth=cv2.CV_8U)
+        blob = cv2.dnn.blobFromImage(frame_out, size=(512, 512), ddepth=cv2.CV_8U)
         net.setInput(blob)
         out = net.forward()
 
         listDetections = []
-        array_center_car = []
+        listPosition = []
         # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
         # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
         # An every detection is a vector [imageId, classId, conf, x, y, X, Y]
@@ -260,51 +261,141 @@ def getRadar(video):
             # label = detection[1]
             conf = detection[2]
 
-            if conf < 0.3:
+            if conf < 0.5:
                 continue
 
             print('conf: ', conf)
             listDetections.append(detection)
 
         print("listDetections: ", len(listDetections))
+        if len(listDetections) != 0:
 
-        for detection in listDetections:
-            # print('conf: ', conf, ' image_id: ', image_id, ' label: ', label)
-            xmin = int(detection[3] * frame.shape[1])
-            ymin = int(detection[4] * frame.shape[0])
-            xmax = int(detection[5] * frame.shape[1])
-            ymax = int(detection[6] * frame.shape[0])
+            for detection in listDetections:
+                if len(listPosition) == 0 and car_tracked == False:
+                    print('Entrou primeira interacao...')
+                    # print('conf: ', conf, ' image_id: ', image_id, ' label: ', label)
+                    xmin = int(detection[3] * frame_out.shape[1])
+                    ymin = int(detection[4] * frame_out.shape[0])
+                    xmax = int(detection[5] * frame_out.shape[1])
+                    ymax = int(detection[6] * frame_out.shape[0])
 
-            if len(array_center_car) == 0:
-                coord = xmin, xmax, ymin, ymax
-                point = calculate_centr_cut(coord)
-                center = point, image_id
-                # print('coord: ', coord)
-                print('calculate_centr: ', center)
-                array_center_car = np.append(array_center_car, center)
-                print("array_center_car 1: ", array_center_car[0])
-                # image_id += 1
+                    coord = xmin, xmax, ymin, ymax
+                    point_center = calculate_centr_cut(coord)
 
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
-                stop = timeit.default_timer()
-                time_cascade = round((stop - start) * 1000, 1)
-                print('Time:', time_cascade, 'ms')
-                ############## Time ##############
-                # putText(frame, str(label), xmin, ymin, color_font)
-                # Print do centro
+                    print('point_center: ', point_center)
+                    # array_center_car = np.append(array_center_car, point_center)
+                    listPosition.append(point_center)
+                    print("listPosition: ", listPosition)
+                    center_last = point_center
+                    # image_id += 1
 
-                frame = cv2.circle(frame, point, radius, color_red, thickness)
-                # putTextPrecision(frame, conf, xmax, ymax, (ymax-ymin), color_red)
+                    # cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
+                    # frame_out = cv2.circle(frame_out, point_center, radius, color_red, thickness)
+                    # putTextPrecision(frame, conf, xmax, ymax, (ymax-ymin), color_red)
+                    # cv2.waitKey(0)
+
+                elif len(array_center_car) != 0 and car_tracked == False and len(listDetections) == 1:
+                    print('Carro trackeado!!')
+                    xmin = int(detection[3] * frame_out.shape[1])
+                    ymin = int(detection[4] * frame_out.shape[0])
+                    xmax = int(detection[5] * frame_out.shape[1])
+                    ymax = int(detection[6] * frame_out.shape[0])
+
+                    coord = xmin, xmax, ymin, ymax
+                    point = calculate_centr_cut(coord)
+                    center = point, image_id
+                    distancia = int(calculate_centr_distances(center_last, point))
+                    print('distancia: ', distancia, 'center_last: ', center_last, 'point: ', point)
+
+                    if distancia < 150:
+                        car_tracked = True
+                        array_center_car = np.append(array_center_car, center)
+                        print('car_tracked: ', car_tracked, '| size_arry: ', len(array_center_car))
+                        ############## Time ##############
+                        start = timeit.default_timer()
+                        print('car_tracked: ', car_tracked)
+
+                        cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
+                        cv2.line(frame_out, center_last, point, (0, 255, 0), 2)
+
+                        frame_out = cv2.circle(frame_out, center_last, radius, color_red, thickness)
+                        frame_out = cv2.circle(frame_out, point, radius, color_red, thickness)
+
+                        center_last = point
+                    else:
+                        print('car_tracked falhou!')
+                        car_tracked = False
+                        array_center_car = []
+
+                    # cv2.waitKey(0)
+
+                elif len(array_center_car) != 0 and car_tracked == True and len(listDetections) == 1:
+                    print('Manutencao do tracking!!')
+                    xmin = int(detection[3] * frame_out.shape[1])
+                    ymin = int(detection[4] * frame_out.shape[0])
+                    xmax = int(detection[5] * frame_out.shape[1])
+                    ymax = int(detection[6] * frame_out.shape[0])
+
+                    coord = xmin, xmax, ymin, ymax
+                    point = calculate_centr_cut(coord)
+                    center = point, image_id
+                    distancia = int(calculate_centr_distances(center_last, point))
+                    print('distancia: ', distancia, 'center_last: ', center_last, 'point: ', point)
+
+                    if distancia < 150:
+                        array_center_car = np.append(array_center_car, center)
+                        print('car_tracked: ', car_tracked, '| size_arry: ', len(array_center_car))
+
+                        cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
+                        cv2.line(frame_out, center_last, point, (0, 255, 0), 2)
+
+                        frame_out = cv2.circle(frame_out, center_last, radius, color_red, thickness)
+                        frame_out = cv2.circle(frame_out, point, radius, color_red, thickness)
+
+                        center_last = point
+                    else:
+                        car_tracked = False
+                        array_center_car = []
+                        stop = timeit.default_timer()
+                        time_cascade = round((stop - start) * 1000, 1)
+                        print('Time:', time_cascade, 'ms')
+                        print('car_tracked: ', car_tracked)
+
+                    # cv2.waitKey(0)
+
+        elif len(array_center_car) != 0 and car_tracked == True and len(listDetections) == 0:
+            car_tracked = False
+            stop = timeit.default_timer()
+            array_center_car = []
+            average_time = round((stop - start) * 1, 1)
+            print('Time:', average_time, 's')
+            velocidade = round((float(delta_s) / float(average_time)) * 3.6)
+            print('velocidade: ', velocidade, ' km/h')
+            print('car_tracked: ', car_tracked)
+
+            cv2.waitKey(0)
 
         print('#######################\n')
-        print("array_center_car: ", array_center_car)
-        showImg = imutils.resize(frame, height=800)
-        cv2.imshow("showImg", showImg)
-        # -- Print img cutImgInit
-        if cutImgInit is not None:
-            cv2.imshow('cutImgInit', cutImgInit)
 
-        if cv2.waitKey(106) & 0xFF == ord('q'):
+        # first = True
+        # last_point = 0
+        # if len(listPosition) != 0:
+        #     for point in listPosition:
+        #         if first:
+        #             last_point = point
+        #             first = False
+        #         else:
+        #             cv2.line(frame_out, last_point, point, (0, 255, 0), 2)
+        #             cv2.circle(frame_out, last_point, radius, color_red, thickness)
+        #             cv2.circle(frame_out, point, radius, color_red, thickness)
+
+        showImg = imutils.resize(frame_out, height=800)
+        cv2.imshow("frame_out", showImg)
+        # -- Print img cutImgInit
+        # if cutImgInit is not None:
+        #     cv2.imshow('cutImgInit', cutImgInit)
+
+        if cv2.waitKey(86) & 0xFF == ord('q'):
             break
 
     video.release()
@@ -326,8 +417,9 @@ if __name__ == '__main__':
     print("shape: ", first_frame.shape)  # 1080x1920x3
 
     # getRadar(video)
-    segmentationOpenCV(video)
+    # segmentationOpenCV(video)
     # segmentationOpenVino(video)
+    getRadar(video)
 
     # When everything done, release the capture
     video.release()
