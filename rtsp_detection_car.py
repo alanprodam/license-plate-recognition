@@ -291,9 +291,6 @@ def getRadar(video):
                     center_last = point_center
                     # image_id += 1
 
-                    # cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
-                    # frame_out = cv2.circle(frame_out, point_center, radius, color_red, thickness)
-                    # putTextPrecision(frame, conf, xmax, ymax, (ymax-ymin), color_red)
                     # cv2.waitKey(0)
 
                 elif len(listPosition) != 0 and car_tracked == False and len(listDetections) == 1:
@@ -321,8 +318,8 @@ def getRadar(video):
                         cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
                         cv2.line(frame_out, center_last, point, color_DarkSlateBlue, 3)
 
-                        frame_out = cv2.circle(frame_out, center_last, radius, color_red, thickness)
-                        frame_out = cv2.circle(frame_out, point, radius, color_red, thickness)
+                        cv2.circle(frame_out, center_last, radius, color_red, thickness)
+                        cv2.circle(frame_out, point, radius, color_red, thickness)
 
                         center_last = point
                     else:
@@ -353,8 +350,8 @@ def getRadar(video):
                         cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
                         cv2.line(frame_out, center_last, point, color_DarkSlateBlue, 3)
 
-                        frame_out = cv2.circle(frame_out, center_last, radius, color_red, thickness)
-                        frame_out = cv2.circle(frame_out, point, radius, color_red, thickness)
+                        cv2.circle(frame_out, center_last, radius, color_red, thickness)
+                        cv2.circle(frame_out, point, radius, color_red, thickness)
 
                         center_last = point
                     else:
@@ -394,10 +391,7 @@ def getRadar(video):
                     current_point = point
                     # print('current_point: ', current_point)
                     cv2.line(frame_out, last_point, current_point, color_blue, 1)
-                    # cv2.circle(frame_out, tuple(last_point), radius, color_red, thickness)
-                    # cv2.circle(frame_out, tuple(current_point), radius, color_red, thickness)
                     last_point = current_point
-
 
         showImg = imutils.resize(frame_out, height=800)
         cv2.imshow("frame_out", showImg)
