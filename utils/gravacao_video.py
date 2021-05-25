@@ -29,13 +29,14 @@ class VideoCapture:
 
 def save_video():
 
-    cap_video = VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
+    # cap_video = VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
+    cap_video = VideoCapture('rtsp://admin:tipa1234@192.168.88.41:554/cam/realmonitor?channel=1&subtype=0')
 
     frame = cap_video.read()
     frame_height, frame_width, _ = frame.shape
     print('frame_height:', frame_height)
     print('frame_width:', frame_width)
-    out_video = cv2.VideoWriter('/home/alan/dataset_letmein/dataset_left.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 10, (frame_width, frame_height))
+    out_video = cv2.VideoWriter('/home/alan/dataset_letmein/dataset_radar.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 10, (frame_width, frame_height))
 
     while True:
         frame = cap_video.read()#.copy()
