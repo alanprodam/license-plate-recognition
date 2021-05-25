@@ -139,30 +139,13 @@ def segmentationOpenVino(video):
         for detection in out.reshape(-1, 4):
             # image_id = detection[0]
             # label = detection[1]
-            conf = detection[1]
+            channels = detection[1]
 
-            if conf < 0.5:
-                continue
+            print('channels: ', channels, 'type-channels: ', type(channels))
 
-            print('conf: ', conf)
-            listDetections.append(detection)
-
-        print("listDetections: ", len(listDetections))
-
-        for detection in listDetections:
-            # print('conf: ', conf, ' image_id: ', image_id, ' label: ', label)
-            xmin = int(detection[2] * frame.shape[1])
-            ymin = int(detection[3] * frame.shape[0])
-            # xmax = int(detection[5] * frame.shape[1])
-            # ymax = int(detection[6] * frame.shape[0])
-            #
-            #
-            # cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), vColor, rectThinkness)
             stop = timeit.default_timer()
             time_cascade = round((stop - start) * 1000, 1)
             print('Time:', time_cascade, 'ms')
-        #     ############## Time ##############
-        #     putText(frame, str(label), xmin, ymin, color_font)
 
         showImg = imutils.resize(frame, height=800)
         cv2.imshow("showImg", showImg)
@@ -235,15 +218,19 @@ def getRadar(video):
 
         # espaço de calculo
         delta_s = 35
-        region_init_x = int(1080 / 1.5)
-        region_init_y = int(1920 / 7)
+        # region_init_x = int(1080 / 1.5)
+        # region_init_y = int(1920 / 7)
 
         # Recorte do veiculo identificado
         frame_out = frame[450:frame_height, 200:frame_width - 500]
-        # cv2.rectangle(frame, (200, 450), (frame_width-500, frame_height), vColor, rectThinkness)
+        cv2.rectangle(frame, (200, 450), (frame_width-500, frame_height), vColor, rectThinkness)
 
-        cutImgInit = frame[region_init_x:frame_width, region_init_y:int(region_init_y * 5)]
-        coord_imgInit = region_init_x, frame_width, region_init_y, int(region_init_y * 5)
+        # # Recorte do veiculo identificado
+        # frame_out = frame[300:frame_height, 200:frame_width - 500]
+        # cv2.rectangle(frame, (200, 300), (frame_width-500, frame_height), vColor, rectThinkness)
+
+        # cutImgInit = frame[region_init_x:frame_width, region_init_y:int(region_init_y * 5)]
+        # coord_imgInit = region_init_x, frame_width, region_init_y, int(region_init_y * 5)
 
         # name: "input" , shape: [1x3x300x300] - An input image in the format [BxCxHxW], where:
         # Chama primeira rede neural referente detecção do veículo
@@ -254,19 +241,20 @@ def getRadar(video):
         out = net.forward()
 
         listDetections = []
-
         # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
         # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
         # An every detection is a vector [imageId, classId, conf, x, y, X, Y]
         for detection in out.reshape(-1, 7):
             # image_id = detection[0]
-            # label = detection[1]
+            classId = detection[1]
             conf = detection[2]
-
+            # if conf < 0.5 and classId != 1:
             if conf < 0.5:
                 continue
-
-            print('conf: ', conf)
+            print('conf: ', conf, ' classId: ', classId)
+            print('listPosition: ', listPosition, ' car_tracked: ', car_tracked)
+            print('-------------------------')
+            # print('conf: ', conf)
             listDetections.append(detection)
 
         print("listDetections: ", len(listDetections))
@@ -305,6 +293,7 @@ def getRadar(video):
                     # center = point, image_id
                     distancia = int(calculate_centr_distances(center_last, point))
                     print('distancia: ', distancia, 'center_last: ', center_last, 'point: ', point)
+                    cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), color_red, rectThinkness)
 
                     if distancia < 150:
                         car_tracked = True
@@ -393,12 +382,16 @@ def getRadar(video):
                     cv2.line(frame_out, last_point, current_point, color_blue, 1)
                     last_point = current_point
 
-        showImg = imutils.resize(frame_out, height=800)
-        cv2.imshow("frame_out", showImg)
+        # showImg = imutils.resize(frame_out, height=800)
+        # cv2.imshow("frame_out", showImg)
 
         # -- Print img cutImgInit
         # if cutImgInit is not None:
         #     cv2.imshow('cutImgInit', cutImgInit)
+        if frame is not None:
+            cv2.imshow('frame_out', frame_out)
+            showImg = imutils.resize(frame, height=800)
+            cv2.imshow("frame-radar", showImg)
 
         if cv2.waitKey(86) & 0xFF == ord('q'):
             break
@@ -409,7 +402,7 @@ def getRadar(video):
 
 if __name__ == '__main__':
     # http://sunlake.letmein.com.br:8110/
-    # video = cv2.VideoCapture("rtsp://admin:tipa1234@192.168.90.244:554/cam/realmonitor?channel=1&subtype=0")
+    # video = cv2.VideoCapture("rtsp://admin:tipa1234@192.168.88.41:554/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@saojoaquim.letmein.com.br:559/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
     video = cv2.VideoCapture('/home/alan/dataset_letmein/radar/dataset_radar.avi')
