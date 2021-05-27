@@ -1,8 +1,10 @@
-import cv2
 import timeit
 import math
 import imutils
-import numpy as np
+import requests
+import json
+import cv2
+
 
 def calculate_centr_cut(coord):
     return (int(abs(coord[0] - coord[1]) / 2 + coord[0]), int(abs(coord[2] - coord[3]) / 2 + coord[2]))
@@ -16,13 +18,50 @@ def putText(frame, result, x1, y1, color_font):
     cv2.putText(frame,
                 result,
                 (x1, y1),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, color_font, 2)  # Nome da clase detectada
+                cv2.FONT_HERSHEY_SIMPLEX, 1, color_font, 3)  # Nome da clase detectada
 
 
 def putTextPrecision(frame, conf, x2, y2, box_h, color_font):
     cv2.putText(frame, str("%.2f" % float(conf)), (x2, y2 - box_h), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color_font, 2)  # Certeza de precisão da classe
 
+def plateCar(frameCropped):
+    url = 'https://lpr.letmein.com.br/upload'
+    color_red = (0, 0, 255)
+    color_blue = (255, 0, 0)
+    rectThinkness = 3
+
+    _, imencoded = cv2.imencode(".jpg", frameCropped)
+    file = {'file': ('lpr.jpg', imencoded)}
+    r = requests.post(url, files=file)
+    data = json.loads(r.text)
+
+    # print(data)
+    # print(data[0]['plate'])
+    # print(data[0]['possiblePlate'])
+    # print(data[0]['probabilities'])
+    # print(data[0]['width'])
+    # print(data[0]['x'])
+    # print(data[0]['y'])
+
+    xmin = data[0]['x'] - data[0]['width']
+    ymin = data[0]['y'] - data[0]['width']
+    xmax = data[0]['x'] + data[0]['width']
+    ymax = data[0]['y'] + data[0]['width']
+    # result = data[0]['plate']
+    result = data[0]['possiblePlate']
+
+    if len(result) > 0:
+        print(result)
+
+        cv2.rectangle(frameCropped, (xmin, ymin), (xmax, ymax), color_red, rectThinkness)
+        putText(frameCropped, result, xmin, ymin, color_blue)
+
+        showImg = imutils.resize(frameCropped, height=800)
+
+        cv2.imshow("frame-radar", showImg)
+        # cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 def segmentationOpenVino(video):
     # Load the model vehicle-recognition-0039 (Identifica o tipo de carro)
@@ -71,7 +110,7 @@ def segmentationOpenVino(video):
         showImg = imutils.resize(frame, height=800)
         cv2.imshow("showImg", showImg)
 
-        if cv2.waitKey(106) & 0xFF == ord('q'):
+        if cv2.waitKey(16) & 0xFF == ord('q'):
             break
 
     video.release()
@@ -133,10 +172,18 @@ def velocityRadar(video, net):
             ymax = int(out_cars[6] * frame_out.shape[0])
             cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), color_red, rectThinkness)
 
+            start = timeit.default_timer()
+
+            plateCar(frame_out)
+
+            stop = timeit.default_timer()
+            time_recognize = round((stop - start) * 1000, 1)
+            print('Time:', time_recognize, 'ms')
+
             coord = xmin, xmax, ymin, ymax
             point_center = calculate_centr_cut(coord)
 
-            print('point_center: ', point_center)
+            # print('point_center: ', point_center)
             detection = out_cars[3], out_cars[4], out_cars[5], out_cars[6]
             # print('conf: ', conf, ' classId: ', classId, 'image_id: ', image_id)
             # print('listPosition: ', listPosition, ' car_tracked: ', car_tracked)
@@ -144,14 +191,14 @@ def velocityRadar(video, net):
 
             listDetections.append(detection)
 
-        print('-------------------------')
-        print('listDetections: ', listDetections)
-        print("size listDetections: ", len(listDetections))
+        # print('-------------------------')
+        # print('listDetections: ', listDetections)
+        # print("size listDetections: ", len(listDetections))
 
-        if len(listDetections) != 0:
-            for image_id, detection in enumerate(listDetections):
-                if not car_tracked:
-                    print('Entrou primeira interacao...')
+        # if len(listDetections) != 0:
+        #     for image_id, detection in enumerate(listDetections):
+        #         if not car_tracked:
+                    # print('Entrou primeira interacao...')
 
 
                     # array_center_car = np.append(array_center_car, point_center)
@@ -246,7 +293,7 @@ def velocityRadar(video, net):
         #
         #     cv2.waitKey(0)
 
-        print('#######################\n')
+        # print('#######################\n')
 
         # first = True
         # last_point = 0
@@ -274,10 +321,10 @@ def velocityRadar(video, net):
             showImgOut = imutils.resize(frame_out, height=800)
             cv2.imshow('frame_out', showImgOut)
 
-            showImg = imutils.resize(frame, height=800)
-            cv2.imshow("frame-radar", showImg)
+            # showImg = imutils.resize(frame, height=800)
+            # cv2.imshow("frame-radar", showImg)
 
-        if cv2.waitKey(106) & 0xFF == ord('q'):
+        if cv2.waitKey(16) & 0xFF == ord('q'):
             break
 
     video.release()
