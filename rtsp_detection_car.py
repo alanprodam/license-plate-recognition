@@ -265,7 +265,7 @@ if __name__ == '__main__':
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@192.168.88.41:554/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@saojoaquim.letmein.com.br:559/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
-    video = cv2.VideoCapture('testVideo/dataset_radar.avi')
+    video = cv2.VideoCapture('/home/alan/dataset_letmein/radar1/dataset_radar.avi')
     # video = cv2.VideoCapture(0)
 
     print('abriu camera!')
