@@ -4,17 +4,6 @@ import math
 import imutils
 import numpy as np
 
-
-# def drawText(frame, scale, rectX, rectY, rectColor, text):
-#     textSize, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, 3)
-#
-#     top = max(rectY - rectThinkness, textSize[0])
-#
-#     cv2.putText(frame, text, (rectX, top), cv2.FONT_HERSHEY_SIMPLEX, scale, rectColor, 3)
-# def calculate_centr(coord):
-#     return (coord[0] + (coord[2] / 2), coord[1] + (coord[3] / 2))
-
-
 def calculate_centr_cut(coord):
     return (int(abs(coord[0] - coord[1]) / 2 + coord[0]), int(abs(coord[2] - coord[3]) / 2 + coord[2]))
 
@@ -33,128 +22,6 @@ def putText(frame, result, x1, y1, color_font):
 def putTextPrecision(frame, conf, x2, y2, box_h, color_font):
     cv2.putText(frame, str("%.2f" % float(conf)), (x2, y2 - box_h), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color_font, 2)  # Certeza de precisão da classe
-
-
-def segmentationOpenCV(video):
-    MIN_EDGE = 450
-    MAX_EDGE = 500
-    while True:
-        ############## Time ##############
-        start = timeit.default_timer()
-
-        # -- Capture frame-by-frame
-        _, frame = video.read()
-
-        if frame is None:
-            continue
-
-        resize_width = int(frame_width * 0.4)
-        resize_height = int(frame_height * 0.4)
-
-        # -- Resize image with INTER_CUBIC
-        resize = cv2.resize(frame, (resize_width, resize_height), interpolation=cv2.INTER_CUBIC)
-
-        # -- Convert in gray scale
-        gray = cv2.cvtColor(frame,
-                            cv2.COLOR_BGR2GRAY)  # -- remember, OpenCV stores color images in Blue, Green, Red
-
-        # -- Detection de edges
-        edges = cv2.Canny(gray, MIN_EDGE, MAX_EDGE, apertureSize=3, L2gradient=True)  # default (350,400)
-
-        # -- Blur bilateral filter
-        blur = cv2.bilateralFilter(edges, 3, 75, 75)
-
-        numLines = 4
-
-        # Deteccao de linhas
-        lines = cv2.HoughLines(blur, numLines, np.pi / 90, 100)
-
-        if lines is not None:
-            if lines.shape[0] >= numLines:
-                x = 0
-                med_theta = 0
-                for i in range(0, numLines):
-                    for rho, theta in lines[i]:
-                        a = np.cos(theta)
-                        b = np.sin(theta)
-                        x0 = a * rho
-                        y0 = b * rho
-                        x1 = int(x0 + 1000 * (-b))
-                        y1 = int(y0 + 1000 * (a))
-                        x2 = int(x0 - 1000 * (-b))
-                        y2 = int(y0 - 1000 * (a))
-
-                        cv2.line(resize, (x1, y1), (x2, y2), (0, 0, 255), 2)
-
-                        # med_theta = med_theta + (theta / numLines)
-                        # lines_vector[i] = theta
-                        x = x + x1 + x2
-
-        stop = timeit.default_timer()
-        time_cascade = round((stop - start) * 1000, 1)
-        print('Time:', time_cascade, 'ms')
-
-        # showImg = imutils.resize(resize, height=800)
-        cv2.imshow("showImg", blur)
-        cv2.imshow("showImg2", frame)
-
-        if cv2.waitKey(106) & 0xFF == ord('q'):
-            break
-
-    video.release()
-    cv2.destroyAllWindows()
-
-
-def segmentationOpenVino(video):
-    # Load the model vehicle-recognition-0039 (Identifica o tipo de carro)
-    net = cv2.dnn.Net_readFromModelOptimizer(
-        'data/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.xml',
-        'data/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.bin')
-
-    # Specify target device
-    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
-
-    while True:
-        ############## Time ##############
-        start = timeit.default_timer()
-
-        # -- Capture frame-by-frame
-        _, frame = video.read()
-
-        if frame is None:
-            continue
-
-        blob = cv2.dnn.blobFromImage(frame, size=(512, 896), ddepth=cv2.CV_8U)
-        net.setInput(blob)
-        out = net.forward()
-
-        # print('out: ', out)
-        # calculate_centr_distances(centroid_1, centroid_2)
-
-        listDetections = []
-        # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
-        # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
-        # An every detection is a vector [imageId, classId, conf, x, y, X, Y]
-        for detection in out.reshape(-1, 4):
-            # image_id = detection[0]
-            # label = detection[1]
-            channels = detection[1]
-
-            print('channels: ', channels, 'type-channels: ', type(channels))
-
-            stop = timeit.default_timer()
-            time_cascade = round((stop - start) * 1000, 1)
-            print('Time:', time_cascade, 'ms')
-
-        showImg = imutils.resize(frame, height=800)
-        cv2.imshow("showImg", showImg)
-
-        if cv2.waitKey(106) & 0xFF == ord('q'):
-            break
-
-    video.release()
-    cv2.destroyAllWindows()
 
 
 def getRadar(video):
@@ -218,19 +85,11 @@ def getRadar(video):
 
         # espaço de calculo
         delta_s = 35
-        # region_init_x = int(1080 / 1.5)
-        # region_init_y = int(1920 / 7)
 
         # Recorte do veiculo identificado
         frame_out = frame[450:frame_height, 200:frame_width - 500]
         cv2.rectangle(frame, (200, 450), (frame_width-500, frame_height), vColor, rectThinkness)
 
-        # # Recorte do veiculo identificado
-        # frame_out = frame[300:frame_height, 200:frame_width - 500]
-        # cv2.rectangle(frame, (200, 300), (frame_width-500, frame_height), vColor, rectThinkness)
-
-        # cutImgInit = frame[region_init_x:frame_width, region_init_y:int(region_init_y * 5)]
-        # coord_imgInit = region_init_x, frame_width, region_init_y, int(region_init_y * 5)
 
         # name: "input" , shape: [1x3x300x300] - An input image in the format [BxCxHxW], where:
         # Chama primeira rede neural referente detecção do veículo
@@ -251,13 +110,13 @@ def getRadar(video):
             # if conf < 0.5 and classId != 1:
             if conf < 0.5:
                 continue
-            print('conf: ', conf, ' classId: ', classId)
-            print('listPosition: ', listPosition, ' car_tracked: ', car_tracked)
-            print('-------------------------')
-            # print('conf: ', conf)
+            # print('conf: ', conf, ' classId: ', classId)
+            # print('listPosition: ', listPosition, ' car_tracked: ', car_tracked)
+            # print('-------------------------')
+
             listDetections.append(detection)
 
-        print("listDetections: ", len(listDetections))
+        # print("listDetections: ", len(listDetections))
         if len(listDetections) != 0:
 
             for detection in listDetections:
@@ -388,6 +247,7 @@ def getRadar(video):
         # -- Print img cutImgInit
         # if cutImgInit is not None:
         #     cv2.imshow('cutImgInit', cutImgInit)
+
         if frame is not None:
             cv2.imshow('frame_out', frame_out)
             showImg = imutils.resize(frame, height=800)
@@ -405,7 +265,7 @@ if __name__ == '__main__':
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@192.168.88.41:554/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture("rtsp://admin:tipa1234@saojoaquim.letmein.com.br:559/cam/realmonitor?channel=1&subtype=0")
     # video = cv2.VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
-    video = cv2.VideoCapture('/home/alan/dataset_letmein/radar/dataset_radar.avi')
+    video = cv2.VideoCapture('testVideo/dataset_radar.avi')
     # video = cv2.VideoCapture(0)
 
     print('abriu camera!')
