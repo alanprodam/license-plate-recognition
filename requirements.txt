@@ -1,5 +1,0 @@
-numpy
-scikit-learn
-Django~=3.2.3
-imutils
-pillow
