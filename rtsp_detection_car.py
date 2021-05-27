@@ -25,6 +25,7 @@ def putTextPrecision(frame, conf, x2, y2, box_h, color_font):
     cv2.putText(frame, str("%.2f" % float(conf)), (x2, y2 - box_h), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color_font, 2)  # Certeza de precisão da classe
 
+
 def plateCar(frameCropped):
     url = 'https://lpr.letmein.com.br/upload'
     color_red = (0, 0, 255)
@@ -62,60 +63,6 @@ def plateCar(frameCropped):
         cv2.imshow("frame-radar", showImg)
         # cv2.waitKey(0)
         cv2.destroyAllWindows()
-
-def segmentationOpenVino(video):
-    # Load the model vehicle-recognition-0039 (Identifica o tipo de carro)
-    net = cv2.dnn.Net_readFromModelOptimizer(
-        'data/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.xml',
-        'data/road-segmentation-adas-0001/FP32/road-segmentation-adas-0001.bin')
-
-    # Specify target device
-    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_INFERENCE_ENGINE)
-
-    while True:
-        ############## Time ##############
-        start = timeit.default_timer()
-
-        # -- Capture frame-by-frame
-        _, frame = video.read()
-
-        if frame is None:
-            continue
-
-        blob = cv2.dnn.blobFromImage(frame, size=(512, 896), ddepth=cv2.CV_8U)
-        net.setInput(blob)
-        out = net.forward()
-
-        # print('out: ', out)
-        # calculate_centr_distances(centroid_1, centroid_2)
-
-        listDetections = []
-        # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
-        # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
-        # An every detection is a vector [imageId, classId, conf, x, y, X, Y]
-        # A saída é um blob com a forma [B, C = 4, H = 512, W = 896]. Ele pode ser tratado como um mapa de recursos
-        # de quatro canais, onde cada canal é uma probabilidade de uma das classes: BG, estrada, meio-fio, marca.
-        for detection in out.reshape(-1, 4):
-            # image_id = detection[0]
-            # label = detection[1]
-            channels = detection[1]
-
-            print('channels: ', channels, 'type-channels: ', type(channels))
-
-            stop = timeit.default_timer()
-            time_cascade = round((stop - start) * 1000, 1)
-            print('Time:', time_cascade, 'ms')
-
-        showImg = imutils.resize(frame, height=800)
-        cv2.imshow("showImg", showImg)
-
-        if cv2.waitKey(16) & 0xFF == ord('q'):
-            break
-
-    video.release()
-    cv2.destroyAllWindows()
-
 
 def velocityRadar(video, net):
     vColor = (0, 255, 0)  # vehicle bounding-rect and information color
@@ -172,13 +119,13 @@ def velocityRadar(video, net):
             ymax = int(out_cars[6] * frame_out.shape[0])
             cv2.rectangle(frame_out, (xmin, ymin), (xmax, ymax), color_red, rectThinkness)
 
-            start = timeit.default_timer()
-
-            plateCar(frame_out)
-
-            stop = timeit.default_timer()
-            time_recognize = round((stop - start) * 1000, 1)
-            print('Time:', time_recognize, 'ms')
+            # start = timeit.default_timer()
+            #
+            # plateCar(frame_out)
+            #
+            # stop = timeit.default_timer()
+            # time_recognize = round((stop - start) * 1000, 1)
+            # print('Time:', time_recognize, 'ms')
 
             coord = xmin, xmax, ymin, ymax
             point_center = calculate_centr_cut(coord)
@@ -318,13 +265,13 @@ def velocityRadar(video, net):
         #     cv2.imshow('cutImgInit', cutImgInit)
 
         if frame is not None:
-            showImgOut = imutils.resize(frame_out, height=800)
-            cv2.imshow('frame_out', showImgOut)
+            # showImgOut = imutils.resize(frame_out, height=800)
+            # cv2.imshow('frame_out', showImgOut)
 
-            # showImg = imutils.resize(frame, height=800)
-            # cv2.imshow("frame-radar", showImg)
+            showImg = imutils.resize(frame, height=800)
+            cv2.imshow("frame-radar", showImg)
 
-        if cv2.waitKey(16) & 0xFF == ord('q'):
+        if cv2.waitKey(106) & 0xFF == ord('q'):
             break
 
     video.release()
