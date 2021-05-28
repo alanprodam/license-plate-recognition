@@ -9,6 +9,28 @@ import cv2
 import config
 from configs import config_application
 
+
+def network_infer(frame, dim, net, w, h, conf=0.6):
+    blob = cv2.dnn.blobFromImage(frame, size=dim, ddepth=cv2.CV_8U)
+    net.setInput(blob)
+    out = net.forward()
+    cars = []
+    for detection in out.reshape(-1, 7):
+        classId = int(detection[1])
+        confidence = float(detection[2])
+        if confidence > conf and classId == 1:
+            xmin = int(detection[3] * w)
+            ymin = int(detection[4] * h)
+            xmax = int(detection[5] * w)
+            ymax = int(detection[6] * h)
+            car_coord = (xmin, ymin, xmax - xmin, ymax - ymin)
+            cars.append(car_coord)
+            # coord = xmin, xmax, ymin, ymax
+            # point_center = calculate_centr(coord)
+        else:
+            break
+    return cars
+
 class CarDetection:
     def __init__(self):
         self.max_queue_size = config_application.max_queue_size
@@ -17,8 +39,8 @@ class CarDetection:
         self.process.daemon = True
         self.last_frame = []
 
-        self.min_face_height = config_application.min_size
-        self.max_face_height = config_application.max_size
+        self.min_car_height = config_application.min_size
+        self.max_car_height = config_application.max_size
 
         # Neural network for face identification
         self.net = cv2.dnn.readNet(
@@ -33,9 +55,9 @@ class CarDetection:
         # Detectar face no frame especificado
         self.process_frame = config.process_frame
 
-        self.track_faces = []
-        self.tracked_faces_queue = Queue(maxsize=config_application.max_queue_size)
-        self.tracked_faces_queue_recognition = Queue(maxsize=config_application.max_queue_size)
+        self.track_cars = []
+        self.tracked_cars_queue = Queue(maxsize=config_application.max_queue_size)
+        # self.tracked_cars_queue_recognition = Queue(maxsize=config_application.max_queue_size)
         self.max_track_size = config_application.max_track_size
         self.min_frames_before_recognition = config_application.min_frames_before_recognition
         self.track_life = config_application.track_life_in_seconds
@@ -46,12 +68,12 @@ class CarDetection:
         print("CarDetection running! pid:", os.getpid())
         # keep looping indefinitely until the thread is stopped
 
-        scale_percent = 25  # percent of original size
+        # scale_percent = 25  # percent of original size
         width_orig = 1920
         height_orig = 1080
-        width = int(width_orig * scale_percent / 100)
-        height = int(height_orig * scale_percent / 100)
-        dim = (width, height)
+        # width = int(width_orig * scale_percent / 100)
+        # height = int(height_orig * scale_percent / 100)
+        dim = (512, 512)
 
         skip_frame = False
         skip_N_frames = False
@@ -92,12 +114,12 @@ class CarDetection:
             if self.process_frame == 0:
                 frame_to_process = frame_left
             else:
-                frame_to_process = frame_right
+                frame_to_process = frame_left
 
-            # faces = network_infer(frame_to_process, dim, self.net, width_orig, height_orig)
-            #
-            # tracks_found = []
-            # for (x, y, w, h) in faces:
+            cars = network_infer(frame_to_process, dim, self.net, width_orig, height_orig)
+
+            tracks_found = []
+            # for (x, y, w, h) in cars:
             #     # ignore small and big faces (probably noise)
             #     if h < self.min_face_height or h > self.max_face_height:
             #         # print('Face ignored due to size. Face height size:', h, 'Min and Max allowed:', self.min_face_height, self.max_face_height)

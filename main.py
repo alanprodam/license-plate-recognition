@@ -23,16 +23,30 @@ spcial_char_map = {ord('á'): 'a', ord('ã'): 'a', ord('â'): 'a',
                    }
 
 _print = print
+
+
 def log_print(*args, **options):
     _print(datetime.datetime.now().strftime(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')), end='   ')
     _print(*args, **options)
+
+
 # Change the print function globally
 import builtins
+
 builtins.print = log_print
+
+
+def show_camera_fail(background_fail):
+    cv2.imshow('Zion', background_fail)
+    cv2.waitKey(500)
 
 def main():
     # video capture object
     cap = Sr.StreamReader(config.address_cam, 'Camera Car')
+
+    # load images
+    # inactive = cv2.imread('images/reconhecimento_inativo.png')
+    camera_fail = cv2.imread('images/background_falha.jpg')
 
     # Show image configuration
     cv2.namedWindow('Zion', cv2.WINDOW_AUTOSIZE)
@@ -48,12 +62,15 @@ def main():
         # Capture the video frame
         frame_to_process = cap.read()
 
+        if frame_to_process is None:
+            show_camera_fail(camera_fail)
+            continue
 
         # Exibe a data atual
         curr_date = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S.%f')[:-3]
         cv2.putText(frame_to_process, 'Data: ' + curr_date, (15, 90), cv2.FONT_HERSHEY_DUPLEX, 1.0, (10, 255, 10), 1)
 
-        cv2.imshow('LetMeIn', frame_to_process)
+        cv2.imshow('Zion', frame_to_process)
 
         # the 'q' button is set as the quitting button
         if cv2.waitKey(5) & 0xFF == ord('q'):
@@ -67,6 +84,7 @@ def main():
 
     print('Main process done.')
     return
+
 
 if __name__ == "__main__":
     # main()
