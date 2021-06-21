@@ -150,8 +150,8 @@ def main():
                           color_green,
                           rectThinkness)
             cv2.circle(frame_to_process, point_center, 3, color_red, rectThinkness*3)
-            # plate = plateCar(frame_to_process)
-            # print('plate: ', plate)
+            plate = plateCar(frame_to_process)
+            print('plate: ', plate)
 
         # Exibe a data atual
         curr_date = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S.%f')[:-3]
@@ -160,7 +160,7 @@ def main():
         cv2.imshow('Zion', frame_to_process)
 
         # the 'q' button is set as the quitting button
-        if cv2.waitKey(5) & 0xFF == ord('q'):
+        if cv2.waitKey(107) & 0xFF == ord('q'):
             # ending the program
             cap.stop_thread()
             break

@@ -3,3 +3,4 @@ scikit-learn
 Django~=3.2.3
 imutils
 pillow
+opencv-python~=4.5.1.48
