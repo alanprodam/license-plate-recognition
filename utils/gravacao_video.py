@@ -31,7 +31,8 @@ class VideoCapture:
 def save_video():
     # cap_video = VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:569/cam/realmonitor?channel=1&subtype=0')
     # cap_video = VideoCapture('rtsp://admin:tipa1234@192.168.88.41:554/cam/realmonitor?channel=1&subtype=0')
-    cap_video = VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:570?channel=1&stream=0.sdp')
+    # cap_video = VideoCapture('rtsp://admin:g551nt3l@sunlake.letmein.com.br:570?channel=1&stream=0.sdp')
+    cap_video = VideoCapture('rtsp://admin:tipa1234@saojoaquim.letmein.com.br:560/cam/realmonitor?channel=1&subtype=0')
     # cap_video = VideoCapture("rtsp://admin:tipa1234@192.168.88.243:554/cam/realmonitor?channel=1&subtype=0")
     frame = cap_video.read()
     frame_height, frame_width, _ = frame.shape
@@ -49,6 +50,6 @@ def save_video():
         if chr(cv2.waitKey(80) & 255) == 'q':
             break
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     save_video()
